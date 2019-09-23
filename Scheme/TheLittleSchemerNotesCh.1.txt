@@ -1,0 +1,244 @@
+Notes on the Little Schemer
+
+Chapter 1:
+
+What is an atom?
+Could be a number, character, string of letters (a word), special characters or a mix of all of the above.
+e.g        12      'a'        'yeet'                            $                     'yolo@2014'
+
+(' or quote) are two different ways to show "data" section to evaluator
+> 'atom => atom
+> '(atom) => 
+> (quote atom)
+
+
+Commonly used "names" in this book:
+l => list of S-Expressions (car '(a c) '(b))
+lat => list of atoms '(a b c)
+
+All atoms are S-expressions. Notice the plurality in atom(s). One atom by itself is not a list unless it has a parenthesis making it a list.
+
+What is a S-expression?
+A *symbolic-expression* is a lat(list of atoms) or l(list of S-expressions)
+
+Multiple S-expressions can also be a list
+
+How do you know how many S-Expressions are there?
+Count the parens (parenthesis) at the end OR the beginning.
+
+() is a list. Also known as the null or empty list.
+
+Law of car
+
+Returns the first atom or S-expression of a list.
+CAR is defined only for non-empty lists
+
+car can only be called this way... where l is a list
+(car l)
+
+When writing this code you must have an apostrophe (') at the beginning of the "data" to show the the interpreter that this is data.
+
+When you call car twice:
+(car (car l))
+where l is (((hotdogs)) (and))
+
+the first car takes the first instance of a list and the second car takes the second instance within the first instance.
+
+So the result is (hotdogs). 
+
+(>) represents the imaginary evaluator for the code in my notes.
+
+Law of cdr (pronounced could-er)
+
+>(cdr '(a b c))
+>(b c)
+
+cdr takes anything after the first list in a enclosing list
+
+> (cdr '(hamburger))
+> ()
+
+cdr goes through a list of atoms like (a b c) and only returns the 
+(b c) or the rest of the list excluding the first atom (or list).
+
+> (cdr '((x) t r))
+> (t r)
+
+> (cdr 'hotdogs)
+> error (cannot ask for cdr of an atom)
+
+(car (cdr l))
+where l is ((b) (x y) ((c)))
+
+> (car (cdr ((b) (x y) ((c)))))
+> (x y)
+
+Tip on nested functions: 
+Start from the inside and go outwards.
+
+So: cdr takes out (x y) ((c))
+    next, car takes the first exp.
+    which is (x y)
+
+> cdr '()
+> You cannot ask for the cdr of the null list
+
+> (cdr (cdr l))
+where l is ((b) (x y) ((c)))
+> (cdr (cdr ((b) (x y) ((c)))))
+> (cdr ((x y) ((c)))
+> (((c)))
+
+> (cdr (car l))
+l is (a (b (c)) d)
+> (car l) = a
+but a is only an atom so cdr cant
+do anything with it. Since cdr does not take atoms as arguments.
+
+Reminder: What do car and cdr take as an argument?
+
+Any non-empty list
+
+> (cons a l)
+where a is 'peanut
+and l is '(butter and jelly)
+> (peanut butter and jelly)
+
+cons adds an atom to the front of the list.
+
+> cons of s and l
+s is (banana and)
+l is (peanut butter and jelly)
+> ((banana and) peanut butter and jelly)
+
+> (cons s l)
+
+s is ((help) this)
+l is (is very ((hard) to learn))
+
+> (((help) this) is very ((hard) to learn))
+
+cons takes two arguments:
+first one is any S-expression
+second one is any list
+Result is a list.
+
+> (cons s l)
+s is (a b (c))
+l is ()
+> ((a b (c)))
+
+If empty list as second argument for cons then it surrounds the first argument.
+
+> (cons s l)
+s is a
+l is ()
+> (a)
+
+> (cons s l)
+where s is ((a b c))
+l is b
+What about where...
+> (cons s l)
+s is a
+l is b
+Would that work?
+> (a . b)
+No Answer. Why?
+
+Second argument to cons must be a list
+The result is a list.
+
+The dot indicates the S-expression as a dotted pair, a so called cons pair rather than a list.
+
+> (cons s (car l))
+where s is a
+and l is ((b) c d)
+Step 1: (cons a (car ((b) c d)))
+Step 2: (cons a (b))
+Result: a goes in the b list
+So: (a b)
+
+> (cons a (cdr ((b) c d)))
+> (cons a (c d))
+> (a c d)
+
+Can null? be applied to an arg of 'spaghetti? No answer or practically you
+get a false for anything but an empty list. like (). AND YOU CANNOT ASK null? of an atom.
+
+> (atom? (Harry had a heap of apples))
+> #F
+Why? Since the arg is a list of atoms not one atom.
+
+How many args does (atom?) take and what are they?
+It takes one argument. And the argument can be any S-expression. An S-expression can be one 'atom '(atom) or '(a b c).
+
+> (atom? (car (Harry had a heap of apples))
+> T
+b/c car takes only the first atom
+
+> (atom? (cdr (Harry had a heap of apples)))
+> F
+b/c cdr takes everything after the first atom
+so it is multiple atoms therefore it is false.
+
+> (atom? (cdr '(Harry)))
+> F
+b/c only emptiness after harry () which is not an atom
+
+> (atom? (car (cdr (swing low sweet cherry oat))))
+> (atom? (car (low sweet cherry oat)))
+> (atom? (low))
+> T
+
+> (atom? (car (cdr (swing 
+	(low sweet) cherry oat))))
+> ((atom? (car (low sweet) cherry oat)))
+> (atom? (low sweet))
+> F
+Since the result is a list
+
+T or F? 
+> (eq? a1 a2)
+a1 is Harry
+a2 is Harry
+> T
+
+How many and what kind of arguments does (eq?) take?
+It only takes two arguments and both must be non-numeric atoms.
+
+> (eq? () (strawberry))
+ No answer
+Both () and (strawberry) are lists
+In practice if lists are used with eq? both must be exactly the same.
+
+> (eq? 6 7)
+ No answer
+6 and 7 are numbers. Only non-numeric atoms may be used in eq?
+
+> (eq? (car (Mary had a little lamb chop) Mary)))
+> (eq? Mary Mary)
+> T
+
+> (eq? (cdr (soured milk) milk))
+> (eq? (milk) milk)
+The right answer: is No answer
+
+why? (milk) is a list while milk is an atom, therefore as per the rule of eq?
+only atoms may be compared for equality.
+
+> (eq? (car '(beans beans we 
+need jelly beans)) 
+(car (cdr '(beans beans we need jelly beans))))
+> (eq? (car '(beans beans we 
+need jelly beans)) 
+(car '(beans we need jelly beans)))
+> (eq? (car '(beans beans we need jelly beans)) beans))
+> (eq? beans beans)
+> T
+
+Note: the parens before car goes away when
+it is evaluated. 
+
+FINALLY DONE WITH CHAPTER 1...WOOOOOOO!!!
+

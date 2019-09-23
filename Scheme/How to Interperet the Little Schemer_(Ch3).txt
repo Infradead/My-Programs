@@ -1,0 +1,209 @@
+Chapter 3:
+
+What is (rember a lat)
+where a is mint
+and lat is (lamb chops and mint jelly)
+
+> (rember 'mint '(lamb chops and mint jelly))
+> (lamb chops and jelly)
+
+rember takes an atom and a lat
+
+So, rember takes out the first specified atom of the original list and leaves a new list without the first atom.
+
+What does rember do when...
+a is mint
+lat is (lamb chops and mint flavored mint jelly)
+
+It only takes out the first instance of mint.
+
+************************************************************
+BTW How does cond work?
+(this is taken from the gnu website)
+A cond expression does the following:
+
+Evaluates the predicate expressions of successive clauses in order, until one of the predicates evaluates to a true value.
+When a predicate evaluates to a true value, cond evaluates the expressions in the associated clause in left to right order, 
+and returns the result of evaluating the last expression in the clause as the result of the entire cond expression.
+If the selected clause contains only the predicate and no expressions, cond returns the value of the predicate as the result.
+
+If all predicates evaluate to false values, and there is no else clause, the result of the conditional expression is unspecified; 
+if there is an else clause, cond evaluates its expressions (left to right) and returns the value of the last one.
+(cond ((> 3 2) 'greater)
+      ((< 3 2) 'less))                  ?  greater
+
+(cond ((> 3 3) 'greater)
+      ((< 3 3) 'less)
+      (else 'equal))                    ?  equal
+**************************************************************
+What does (rember a lat) do?
+Heres my answer:
+
+Always start off asking questions using cond.
+And then as said before the first question is always null?
+You use else when you are done asking questions
+
+(define rember
+  (lambda (a lat)
+    (cond
+    ((null? lat) #f) <--- IF this is true return ()
+      (else (or (eq? (car lat) a) (rember a (car lat))
+
+rember according to the book
+
+(define rember
+  (lambda (a lat)
+    (cond
+    ((null? lat) (quote ()))
+      ((eq? (car lat) a) (cdr lat))
+         (else (rember a
+                       (cdr lat))))))  
+
+But the above functions doesnt work 
+take this test case
+
+> (rember 'a '(a b c a d c))
+> (b c a d c)
+
+OR 
+
+> (rember 'a '(b c a d c))
+> (d c)
+
+This second test case takes out the whole preceding list
+whereas its supposed to be preserved.
+
+****************THE SECOND COMMANDMENT*************************
+	"THOU SHALT ALWAYS USE cons TO BUILD LISTS"
+***************************************************************
+a is and
+lat is (bacon lettuce and tomato)
+1) bacon lettuce and tomato
+2) lettuce and tomato
+3) and tomato
+
+(define rember
+	(lambda (a lat)
+	  (cond
+		((null? lat) (quote ())) <--- if null? is #T then return '() if #F move on
+		(else (cond              <--- cond means you begin asking questions AGAIN
+			((eq? (car lat) a) (cdr lat)) <--- If the first value of lat is equal to a (the parameter) 
+											then T is the result and then you remove rest of lat
+
+		***If the above expression is F then go below***
+			1) holding bacon 2) holding lettuce
+			3) 
+			(else (cons (car lat) (rember a (cdr lat)))))) <--- it says to cons the first value 
+		of lat onto (rember a (cdr lat)) but we dont know the value of (rember a (cdr lat)) 
+		therefore we move on, we must first find the value of (rember a (cdr lat)) 
+		
+		This whole mess is confusing up here. 
+**********************************************************************	
+		Pro tip: USE THE STEPPER IN DR RACKET.
+		To use the stepper: Open a fresh buffer, make sure the language level is set to beginning student with list abbreviations, and paste the definition and the call into the definitions window. Click on "step". 
+**********************************************************************	
+In the stepper I realized that cons just sits there with the car values it held and once eq? is T then it takes the cdr
+of lat on the same line and starts consing all the previously held values. Look at rember_function_stepper.PNG and 
+rember_function_stepper2 and 3 PNG files.
+
+// refined version of rember
+// take out second cond and else
+(define rember
+(lambda (a lat)
+(cond
+  ((null? lat) (quote ()))
+  ((eq? (car lat) a) (cdr lat))
+  (else (cons (car lat)
+              (rember a ( cdr lat)))))))
+
+New concept:
+(firsts l)
+where l is ((apple peach pumpkin)
+			(plum pear cherry)
+			(grape raisin pea)
+			(bean carrot eggplant))
+			
+Going by the name i think its the first in every list...
+
+> (firsts l)
+> (apple plum grape bean)
+
+> (firsts ())
+> ()
+
+(firsts l)
+where l is ((five plums)
+			(four)
+			(eleven green oranges))
+
+> (five four eleven)
+
+l is (((five plums) four)
+		(eleven green oranges)
+		((no) more))
+		
+> (firsts l)
+> (five four eleven no more) <--- my answer (its wrong)
+
+firsts takes one argument a list, which may be a null list or non empty list
+firsts returns a new list by taking the first occurences of each list inside a bigger list. 
+
+Right answer
+> ((five plums) eleven (no))
+
+; My wrong function attempt
+;(define firsts
+;   (lambda l
+;     (cond
+;       ((null? l) ('()))
+;        (atom? (car l)) (cons (car l))
+;     (else (firsts (cdr l))))))
+
+Some insight...to call the first typical element
+use car twice
+> (car (car l))
+
+(define firsts
+  (lambda (l)
+    (cond
+      ((null? l) '())
+       (else (cons (car (car l)) (firsts (cdr l)))))))
+
+> (firsts '(((five plums) four)
+		(eleven green oranges)
+		((no) more)))
+		
+How does the Third Commandment work?
+When building a list, describe the first typical element and then cons it onto 
+the natural recursion.
+
+What does describing the first typical element mean?
+Example: ((a b) (c d) (e f))
+It could be a c or e. And programming wise it looks like this:
+(car (car l))
+
+What does consing it onto the natural recursion mean?
+Call the function again in our case (firsts (cdr l)) and then take the rest of the list
+thats left and put it through the function (recursion).
+		
+How does the firsts function work?
+It takes a list, could be filled with any type of atoms.
+It returns the first list of the first instance of a list within a list. If it is an atom,
+it returns the first instance of the atom from the list. 
+
+*** New function: insertR ***
+(insertR new old lat)
+This function takes a new atom, an old atom, and a list of atoms.
+This function inserts to the RIGHT of the old atom a new atom
+in the list of atoms specified. And returns the new lat
+
+REMEMBER: cond means you begin asking questions...
+
+(define insertR
+	(lambda (new old lat)
+		(cond
+			((null? lat) '())
+			(else
+			  (cond
+				(eq? (car lat) old) (cons (car lat)))
+				(else (insertR (cdr lat))))))) 
