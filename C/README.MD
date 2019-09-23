@@ -1,1 +1,1 @@
-Please download the text file along with the program for it to work.
+Please download the sherlock txt file along with the southiesherlock program for it to work.
