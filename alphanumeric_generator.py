@@ -6,7 +6,7 @@
 import random
 import string
 # bounds on length of alphanumeric strings
-# CrushFTP min pass length was 6
+# "Application" min pass length was 6
 # when bruteforcing passes AVOID the chars: @#%/:\
 # Alphabets in uppercase allow for increased attack vector for bruteforcing
 # But injecting @#%/:\ anywhere else may be useful
