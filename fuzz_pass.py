@@ -1,6 +1,6 @@
 # Code by Varun Belani
 # This code checks to see if password fuzzing is successful on login page
-# Using the default crushadmin user
+# Using the default admin user
 import urllib2
 import urllib
 import fuzzy_engine
